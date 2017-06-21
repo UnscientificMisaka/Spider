@@ -1,11 +1,22 @@
 const superagent = require('superagent');
 const config = require('./config');
 const cheerio = require('cheerio');
-const base = 'https://www.nowcoder.com'
+const base = 'https://www.nowcoder.com';
+const Choice = require('./models').Choice;
 var count = 0;
 var cookie;
 var questions = [];
 var num = 0;
+
+var saveQuestion = async (question, options, answer, tags, analysis) => {
+    var choice = new Choice();
+    choice.question = question;
+    choice.options = options;
+    choice.analysis = analysis;
+    choice.answer = answer;
+    choice.tags = tags;
+    await choice.save();
+};
 
 var login = async () => {
     return new Promise((resolve, reject) => {
@@ -82,8 +93,10 @@ var fetchUrl = async (url) => {
                     var $elem = $(elem);
                     options.push($elem.text().trim())
                 })
-                questions.push({ question, options, answer, tags, analysis });
-                console.log(questions)
+                
+                // questions.push({ question, options, answer, tags, analysis });
+                console.log({ question, options, answer, tags, analysis })
+                saveQuestion(question, options, answer, tags, analysis)
                 console.log('当前并发数',count,'当前延迟',delay)
                 if(num < 30) {
                     console.log('target',base + $('.pre-next-box').children().last().attr('href'))
