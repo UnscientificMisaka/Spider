@@ -8,10 +8,11 @@ var cookie;
 var questions = [];
 var num = 0;
 
-var saveQuestion = async (question, options, answer, tags, analysis) => {
+var saveQuestion = async (question, options, kind, answer, tags, analysis) => {
     var choice = new Choice();
     choice.question = question;
     choice.options = options;
+    choice.kind = kind;
     choice.analysis = analysis;
     choice.answer = answer;
     choice.tags = tags;
@@ -63,7 +64,7 @@ var graspUserFinishedTestsUrls = async () => {
 
 var graspTestContents = async () => {
     let urls = await graspUserFinishedTestsUrls();
-    for(var i=0;i<urls.length;i++){
+    for(i = 0;i<urls.length;i++){
         await fetchUrl(base + urls[i]);
     }
 };
@@ -83,7 +84,11 @@ var fetchUrl = async (url) => {
                 var question = $('.subject-question').text();
                 var options = [];
                 var tags = [];
-                var answer = $('.result-subject-answer').text().match(/\w+/)[0];
+                var kind = 'single';
+                var answer = $('.result-subject-answer').children('h1').text().trim().match(/(\w+\n){0,}\w+/)[0].split('\n');
+                if(answer.length > 1) {
+                    kind = 'multiple'
+                }
                 var analysis = $('.js-first-comment').children().find('.answer-brief').text();
                 $('.tag-label').each((i,elem) => {
                     var $elem = $(elem);
@@ -95,10 +100,10 @@ var fetchUrl = async (url) => {
                 })
                 
                 // questions.push({ question, options, answer, tags, analysis });
-                console.log({ question, options, answer, tags, analysis })
-                saveQuestion(question, options, answer, tags, analysis)
+                console.log({ question, options, kind, answer, tags, analysis })
+                saveQuestion(question, options, kind, answer, tags, analysis)
                 console.log('当前并发数',count,'当前延迟',delay)
-                if(num < 30) {
+                if(num < 50) {
                     console.log('target',base + $('.pre-next-box').children().last().attr('href'))
                     fetchUrl(base + $('.pre-next-box').children().last().attr('href'))
                 }

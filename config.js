@@ -3,7 +3,7 @@ module.exports = {
     username: '',
     password: '',
     login_url: 'https://www.nowcoder.com/login/do?token=',
-    profile_url: 'https://www.nowcoder.com/profile/:userid',
+    profile_url: 'https://www.nowcoder.com/profile/1575244',
     headers: {
         Accept:'text/plain, */*; q=0.01',
         'Accept-Encoding':'gzip, deflate, br',
